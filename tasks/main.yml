@@ -1,0 +1,21 @@
+---
+
+- name: Set up users and service directories
+  import_role:
+    name: openstack-common
+    tasks_from: service-setup-docker.yml
+
+- name: Install service config files
+  import_role:
+    name: openstack-common
+    tasks_from: service-configs.yml
+
+- name: Deploy Containers
+  import_role:
+    name: openstack-common
+    tasks_from: service-containers.yml
+
+- name: create neutron container
+  shell: docker run -v /etc/neutron:/etc/neutron:ro -p 8774:8774 -p 8778:8778 -v /var/lib/neutron:/var/lib/neutron -v /var/log/neutron:/var/log/neutron --name neutron --workdir /var/lib/neutron -d -t dockerhub.paypalcorp.com/ajanis/neutron:latest
+  args:
+    executable: /bin/bash

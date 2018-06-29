@@ -1,0 +1,7 @@
+- name: Build Docker image for neutron
+  hosts: localhost
+  become: True
+  tasks:
+    - include_role:
+        name: openstack-neutron
+        tasks_from: dockerbuild.yml

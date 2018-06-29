@@ -1,0 +1,123 @@
+[DEFAULT]
+# Disable stderr logging
+use_stderr = False
+debug = False
+fatal_deprecations = False
+log_file = /var/log/neutron/neutron.log
+state_path = /var/lib/neutron
+lock_path = /var/lock/neutron
+
+## Rpc all
+transport_url = rabbit://{{ openstack_rabbit_user }}:{{ openstack_rabbit_pass }}@{{ openstack_rabbit_host }}
+executor_thread_pool_size = 100
+rpc_response_timeout = 60
+rpc_conn_pool_size = 50
+conn_pool_min_size = 10
+conn_pool_ttl = 1200
+rpc_thread_pool_size = 100
+rpc_message_ttl = 300
+
+# Domain to use for building hostnames
+dns_domain = openstacklocal
+
+
+# General, only applies to neutron server host group
+allow_overlapping_ips = True
+vlan_transparent = False
+
+# Plugins
+core_plugin = ml2
+service_plugins = 
+
+# MTU
+global_physnet_mtu = 9000
+
+# MAC address generation for VIFs
+base_mac = fa:16:3e:00:00:00
+mac_generation_retries = 16
+
+# Authentication method
+auth_strategy = keystone
+
+# Drivers
+network_scheduler_driver = neutron.scheduler.dhcp_agent_scheduler.WeightScheduler
+router_scheduler_driver = neutron.scheduler.l3_agent_scheduler.LeastRoutersScheduler
+loadbalancer_pool_scheduler_driver = neutron_lbaas.services.loadbalancer.agent_scheduler.ChanceScheduler
+
+# Schedulers
+network_auto_schedule = True
+router_auto_schedule = True
+
+# Distributed virtual routing
+router_distributed = False
+enable_dvr = False
+
+# Agents
+agent_down_time = 120
+
+# API
+bind_port = 9696
+bind_host = 0.0.0.0
+
+# Workers
+api_workers = 3
+rpc_workers = 4
+rpc_state_report_workers = 4
+
+# DHCP
+dhcp_agent_notification = True
+dhcp_agents_per_network = 4
+dhcp_lease_duration = 86400
+
+# Driver for external DNS integration. (string value)
+#external_dns_driver = <None>
+
+# Nova notifications
+notify_nova_on_port_status_changes = True
+notify_nova_on_port_data_changes = True
+send_events_interval = 10
+
+[nova]
+os_region_name = RegionOne
+project_domain_name = default
+project_name = service
+auth_type = password
+user_domain_name = default
+auth_url = http://{{ openstack_auth_host }}:35357
+username = nova
+password = {{ openstack_admin_password }}
+
+[keystone_authtoken]
+auth_uri = http://{{ openstack_auth_host }}:5000
+auth_url = http://{{ openstack_auth_host }}:35357
+#memcached_servers = {{ openstack_memcached_ip }}:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = {{ openstack_admin_password }}
+token_cache_time = 300
+memcache_pool_maxsize = 50
+
+[database]
+connection = mysql+pymysql://{{ openstack_neutron_mysql_user }}:{{ openstack_neutron_mysql_pass }}@{{ openstack_mysql_host }}/{{ openstack_neutron_mysql_db }}
+min_pool_size = 10
+max_pool_size = 50
+max_overflow = 100
+pool_timeout = 60
+use_tpool = True
+
+[agent]
+root_helper = sudo
+polling_interval = 10
+report_interval = 10
+
+# Messaging
+[oslo_messaging_rabbit]
+ssl = False
+rabbit_qos_prefetch_count = 0
+pool_max_size = 100
+
+[oslo_concurrency]
+lock_path = $state_path/tmp

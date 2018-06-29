@@ -1,0 +1,7 @@
+- name: Deploy openstack neutron server
+  hosts: openstack_neutron
+  become: True
+  gather_facts: True
+  tasks:
+    - include_role:
+        name: openstack-neutron

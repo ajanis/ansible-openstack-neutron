@@ -1,0 +1,85 @@
+---
+openstack_package_prerequisites:
+  - python-pip
+  - libssl-dev
+  - python-pymysql
+  - python-pil
+  - python-gobject
+  - python-scgi
+  - python-memcache
+  - bridge-utils
+  - ebtables
+  - haproxy
+  - dnsmasq
+  - dnsmasq-utils
+  - conntrack
+  - ipset
+  - tcpdump
+  - openssh-client
+  - rsync
+  - python-virtualenv
+  - supervisor
+
+openstack_service_daemons:
+  - neutron-server
+  - neutron-linuxbridge-agent
+  - neutron-linuxbridge-cleanup
+  - neutron-dhcp-agent
+  - neutron-metadata-agent
+
+openstack_services:
+  - neutron
+
+openstack_sudoers:
+  - neutron
+
+service_files:
+  etc:
+    src: etc
+    dest: /etc/neutron
+
+config_files:
+  neutron.conf:
+    src: neutron.conf.j2
+    dest: /etc/neutron/neutron.conf
+    owner: neutron
+    group: neutron
+    notify:
+      - restart-neutron-server
+      - restart-neutron-linuxbridge-agent
+      - restart-neutron-dhcp-agent
+      - restart-neutron-metadata-agent
+  metadata_agent.ini:
+    src: metadata_agent.ini.j2
+    dest: /etc/neutron/metadata_agent.ini
+    owner: neutron
+    group: neutron
+    notify:
+      - restart-neutron-server
+      - restart-neutron-linuxbridge-agent
+      - restart-neutron-dhcp-agent
+      - restart-neutron-metadata-agent
+  linuxbridge_agent.ini:
+    src: linuxbridge_agent.ini.j2
+    dest: /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+    owner: neutron
+    group: neutron
+    notify:
+      - restart-neutron-server
+      - restart-neutron-linuxbridge-agent
+      - restart-neutron-dhcp-agent
+      - restart-neutron-metadata-agent
+
+contrib_files:
+  supervisord.conf:
+    src: contrib/etc/supervisord/supervisord.conf
+    dest: /etc/supervisor/conf.d/supervisord.conf
+    owner: root
+    group: root
+    notify:
+      - reread supervisor
+      - reload supervisor
+
+openstack_source_projects:
+  - neutron
+  - python-neutronclient
